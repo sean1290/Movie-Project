@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>폭스 러닝 센터 | 영화 제작 오리엔테이션 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+KR:wght@300;400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #e5e5e5;
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, .cinematic-font {
+            font-family: 'Cinzel', serif;
+        }
+
+        .film-grain {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            z-index: 50;
+        }
+
+        .reveal-section {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        
+        .reveal-section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #ffffff, #999999, #ffffff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine { to { background-position: 200% center; } }
+
+        .lab-card {
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .lab-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255,255,255,0.4);
+            box-shadow: 0 10px 30px -10px rgba(255,255,255,0.1);
+        }
+
+        #modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(15px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        #fullscreen-toggle {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 45;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.75rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .float-anim { animation: float 6s ease-in-out infinite; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.1) 10%, rgba(255,255,255,0.1) 90%, transparent);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="film-grain"></div>
+
+    <button id="fullscreen-toggle">
+        <i data-lucide="maximize" class="w-5 h-5"></i>
+    </button>
+
+    <div id="modal-overlay">
+        <div class="bg-zinc-900 border border-white/20 p-6 md:p-10 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl">
+            <button id="close-modal" class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors">
+                <i data-lucide="x" class="w-8 h-8"></i>
+            </button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <nav class="fixed top-0 w-full z-40 bg-black/80 backdrop-blur-md border-b border-white/10" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="cinematic-font text-xl tracking-widest font-bold text-white flex items-center gap-2 ml-12 lg:ml-0">
+                <i data-lucide="clapperboard" class="w-6 h-6 text-red-500"></i>
+                FOX LEARNING CENTER
+            </div>
+            <div class="hidden md:flex space-x-8 text-sm tracking-widest uppercase text-gray-400">
+                <a href="#about" class="hover:text-white transition-colors">Crew</a>
+                <a href="#mission" class="hover:text-white transition-colors">Mission</a>
+                <a href="#curriculum" class="hover:text-white transition-colors">Schedule</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="relative h-screen flex items-center justify-center overflow-hidden">
+        <div class="relative z-10 text-center px-4 max-w-5xl mx-auto">
+            <p class="text-sm md:text-base text-gray-400 tracking-[0.2em] mb-6 opacity-0 translate-y-4" id="hero-sub">폭스러닝센터 2026 겨울방학 스페셜 프로그램</p>
+            <h1 class="text-5xl md:text-7xl lg:text-9xl font-bold mb-8 leading-tight tracking-tighter" id="hero-title">
+                MOVIE<br>
+                <span class="gradient-text">PROJECT</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-12 opacity-0 font-light" id="hero-desc">
+                From consumer to creator
+            </p>
+            <div class="opacity-0" id="hero-btn">
+                <a href="#about" class="group relative px-10 py-5 bg-white text-black font-bold rounded-full transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-3">
+                    START PRODUCTION <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                </a>
+            </div>
+        </div>
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-30">
+            <i data-lucide="chevron-down" class="w-8 h-8"></i>
+        </div>
+    </header>
+
+    <section id="about" class="py-32 px-6 relative z-10">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="reveal-section">
+                <h2 class="text-3xl md:text-5xl font-bold mb-8 uppercase tracking-widest">You Are The Crew</h2>
+                <p class="text-gray-400 text-lg leading-relaxed mb-16 max-w-3xl mx-auto">
+                    나의 겨울, 나의 이야기, 나의 꿈을 기획, 협력, 창작하는 프로젝트<br>
+                    <span class="text-xs font-bold text-red-500 uppercase tracking-widest mt-4 block">(카드를 클릭하여 상세 템플릿을 확인하세요)</span>
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 reveal-section">
+                <div class="bg-white/5 border border-white/10 p-10 rounded-3xl lab-card group" onclick="openLabModal('create')">
+                    <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-6 mx-auto group-hover:bg-white/10 transition-colors">
+                        <i data-lucide="pen-tool" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Create</h3>
+                    <p class="text-sm text-gray-400">우리의 이야기를 대본으로 창작합니다.</p>
+                </div>
+                <div class="bg-white/5 border border-white/10 p-10 rounded-3xl lab-card group" onclick="openLabModal('film')">
+                    <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-6 mx-auto group-hover:bg-white/10 transition-colors">
+                        <i data-lucide="video" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Film</h3>
+                    <p class="text-sm text-gray-400">렌즈를 통해 세상을 보고 현장을 지휘합니다.</p>
+                </div>
+                <div class="bg-white/5 border border-white/10 p-10 rounded-3xl lab-card group" onclick="openLabModal('edit')">
+                    <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-6 mx-auto group-hover:bg-white/10 transition-colors">
+                        <i data-lucide="monitor-play" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Edit</h3>
+                    <p class="text-sm text-gray-400">AI 툴을 활용하여 완성도 높은 작품을 만듭니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="mission" class="py-32 px-6 bg-zinc-900/30 border-y border-white/5">
+        <div class="max-w-5xl mx-auto">
+            <div class="reveal-section text-center mb-20">
+                <h2 class="text-3xl md:text-5xl font-bold mb-4 uppercase tracking-widest">The Mission</h2>
+                <p class="text-gray-400 text-lg italic">한 달의 시간, 하나의 비전, 하나의 걸작.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center reveal-section">
+                <div class="space-y-10">
+                    <div class="flex items-start gap-6">
+                        <div class="mt-1 p-3 bg-red-500/10 rounded-2xl"><i data-lucide="heart" class="w-7 h-7 text-red-500"></i></div>
+                        <div>
+                            <h4 class="text-xl font-bold mb-1 text-white">Moral of the Story</h4>
+                            <p class="text-gray-400 leading-relaxed">의미 있는 이야기는 관객의 마음속에 영원히 남습니다. 당신의 영화는 어떤 메시지를 담고 있나요?</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-6">
+                        <div class="mt-1 p-3 bg-blue-500/10 rounded-2xl"><i data-lucide="camera" class="w-7 h-7 text-blue-500"></i></div>
+                        <div>
+                            <h4 class="text-xl font-bold mb-1 text-white">Cinematic Style</h4>
+                            <p class="text-gray-400 leading-relaxed">역동적인 움직임, 드라마틱한 조명, 그리고 강력한 연기. 우리는 단순히 기록하는 것이 아니라 '영화'를 만듭니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-black border border-white/10 p-10 rounded-3xl shadow-2xl">
+                    <h3 class="cinematic-font text-2xl mb-8 text-center tracking-widest">PRODUCTION PHASES</h3>
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-center"><span class="font-bold text-lg">Art Lab</span><span class="text-xs text-gray-500 font-mono">소품 & 세트 디자인</span></div>
+                        <div class="flex justify-between items-center"><span class="font-bold text-lg">Music Lab</span><span class="text-xs text-gray-500 font-mono">효과음 & 배경음악</span></div>
+                        <div class="flex justify-between items-center"><span class="font-bold text-lg">AI Lab</span><span class="text-xs text-gray-500 font-mono">촬영 & 편집 자동화</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="curriculum" class="py-32 px-6 relative overflow-hidden">
+        <div class="max-w-5xl mx-auto">
+            <div class="mb-24 text-center reveal-section">
+                <h2 class="text-3xl md:text-5xl font-bold mb-4 uppercase tracking-[0.2em]">The Schedule</h2>
+                <p class="text-gray-400">레드카펫으로 향하는 4주간의 로드맵</p>
+            </div>
+            
+            <div class="relative">
+                <div class="timeline-line hidden md:block"></div>
+                
+                <div class="space-y-24">
+                    <!-- Week 1 -->
+                    <div class="flex flex-col md:flex-row gap-8 items-center reveal-section">
+                        <div class="w-full md:w-1/2 text-center md:text-right order-2 md:order-1">
+                            <div class="text-4xl font-bold text-white/20 mb-2 cinematic-font">WEEK 01</div>
+                            <h3 class="text-2xl font-bold mb-3">Pre-Production: 기획 및 구성</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                영화의 핵심 컨셉을 도출하고 세계관을 구축합니다.<br>
+                                캐릭터 설정과 전체적인 스토리라인(로그라인)을 완성합니다.
+                            </p>
+                        </div>
+                        <div class="z-10 bg-white p-4 rounded-full shadow-xl order-1 md:order-2">
+                            <i data-lucide="pencil" class="w-6 h-6 text-black"></i>
+                        </div>
+                        <div class="hidden md:block w-1/2 order-3"></div>
+                    </div>
+
+                    <!-- Week 2 -->
+                    <div class="flex flex-col md:flex-row gap-8 items-center reveal-section">
+                        <div class="hidden md:block w-1/2"></div>
+                        <div class="z-10 bg-white p-4 rounded-full shadow-xl">
+                            <i data-lucide="file-text" class="w-6 h-6 text-black"></i>
+                        </div>
+                        <div class="w-full md:w-1/2 text-center md:text-left">
+                            <div class="text-4xl font-bold text-white/20 mb-2 cinematic-font">WEEK 02</div>
+                            <h3 class="text-2xl font-bold mb-3">Screenwriting: 대본 및 콘티</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                실제 촬영을 위한 대본을 작성하고 시각적 가이드라인인 콘티(Storyboard)를 제작합니다. 각 장면의 앵글과 연출을 구체화합니다.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Week 3 -->
+                    <div class="flex flex-col md:flex-row gap-8 items-center reveal-section">
+                        <div class="w-full md:w-1/2 text-center md:text-right order-2 md:order-1">
+                            <div class="text-4xl font-bold text-white/20 mb-2 cinematic-font">WEEK 03</div>
+                            <h3 class="text-2xl font-bold mb-3">Production: 현장 촬영</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                카메라와 장비를 활용하여 본격적인 촬영을 진행합니다.<br>
+                                감독, 배우, 스태프의 역할을 수행하며 현장의 마법을 기록합니다.
+                            </p>
+                        </div>
+                        <div class="z-10 bg-white p-4 rounded-full shadow-xl order-1 md:order-2">
+                            <i data-lucide="camera" class="w-6 h-6 text-black"></i>
+                        </div>
+                        <div class="hidden md:block w-1/2 order-3"></div>
+                    </div>
+
+                    <!-- Week 4 -->
+                    <div class="flex flex-col md:flex-row gap-8 items-center reveal-section">
+                        <div class="hidden md:block w-1/2"></div>
+                        <div class="z-10 bg-white p-4 rounded-full shadow-xl">
+                            <i data-lucide="wand-2" class="w-6 h-6 text-black"></i>
+                        </div>
+                        <div class="w-full md:w-1/2 text-center md:text-left">
+                            <div class="text-4xl font-bold text-white/20 mb-2 cinematic-font">WEEK 04</div>
+                            <h3 class="text-2xl font-bold mb-3">Post-Production: AI 편집 및 완성</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                촬영본을 바탕으로 AI 툴을 활용해 정교한 편집을 진행합니다.<br>
+                                사운드 디자인, 색보정, 특수효과를 통해 최종 결과물을 완성합니다.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Screening -->
+                    <div class="mt-32 reveal-section text-center">
+                        <div class="inline-block px-8 py-12 bg-white/5 border border-white/20 rounded-[3rem] backdrop-blur-xl relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-gradient-to-r from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                            <div class="relative z-10">
+                                <div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(220,38,38,0.5)]">
+                                    <i data-lucide="ticket" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <h3 class="text-3xl font-bold mb-4 tracking-tighter">Grand Screening: 상영회</h3>
+                                <p class="text-gray-400 mb-6">우리가 만든 영화가 처음으로 관객과 만나는 순간</p>
+                                <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-xs font-bold text-white uppercase tracking-widest">
+                                    <i data-lucide="info" class="w-3 h-3"></i> 일정 추후 공지 예정
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-20 px-6 border-t border-white/10 text-center">
+        <div class="cinematic-font text-xl tracking-[0.5em] text-white opacity-40">FOX LEARNING CENTER | 2026</div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        gsap.registerPlugin(ScrollTrigger);
+
+        const labTemplates = {
+            create: `
+                <div class="space-y-8">
+                    <div class="flex items-center gap-4 border-b border-white/10 pb-4">
+                        <i data-lucide="pen-tool" class="w-10 h-10 text-blue-400"></i>
+                        <h2 class="text-2xl md:text-3xl font-bold cinematic-font">Screenwriting Template</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-5 bg-white/5 rounded-2xl border border-white/10">
+                            <label class="block text-xs uppercase tracking-widest text-blue-400 mb-2">Movie Name / 영화 제목</label>
+                            <p class="text-white italic text-sm">작품의 제목을 입력하세요...</p>
+                        </div>
+                        <div class="p-5 bg-white/5 rounded-2xl border border-white/10">
+                            <label class="block text-xs uppercase tracking-widest text-blue-400 mb-2">Summary / 로그라인</label>
+                            <p class="text-white text-sm">영화의 핵심 갈등을 한 문장으로 요약하세요.</p>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-white/5 rounded-2xl border border-white/10">
+                        <label class="block text-xs uppercase tracking-widest text-blue-400 mb-2">Character Cast / 등장 인물</label>
+                        <ul class="text-sm text-gray-400 space-y-3 mt-2">
+                            <li class="flex justify-between border-b border-white/5 pb-2"><span>주인공 (Protagonist)</span> <span class="text-white font-mono text-xs">이름, 성격, 목표</span></li>
+                            <li class="flex justify-between border-b border-white/5 pb-2"><span>적대자 (Antagonist)</span> <span class="text-white font-mono text-xs">방해 요소 또는 인물</span></li>
+                        </ul>
+                    </div>
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-lg">Dialogue & Directions / 대본 창작</h4>
+                        <div class="bg-black/80 p-6 rounded-2xl border border-white/5 font-mono text-xs md:text-sm leading-relaxed text-gray-300">
+                            <span class="text-blue-400">[장소: 교실 - 늦은 오후]</span><br><br>
+                            창밖으로 노을이 진다. <span class="text-yellow-500">수현</span>이 책상에 엎드려 있다.<br><br>
+                            <span class="text-red-400">수현:</span> "우리의 겨울은 이제 시작이야."<br><br>
+                            <span class="text-yellow-500">민호:</span> (카메라를 세팅하며) "준비됐어? 큐!"<br><br>
+                            <span class="text-blue-400">[카메라: 수현의 눈동자로 천천히 다가가는 트래킹 샷]</span>
+                        </div>
+                    </div>
+                </div>
+            `,
+            film: `
+                <div class="space-y-8">
+                    <div class="flex items-center gap-4 border-b border-white/10 pb-4">
+                        <i data-lucide="video" class="w-10 h-10 text-red-400"></i>
+                        <h2 class="text-2xl md:text-3xl font-bold cinematic-font">Directing Shot List</h2>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="p-6 bg-white/5 rounded-2xl border border-white/10">
+                            <h4 class="font-bold text-red-400 mb-1">SCENE 1: 시작의 순간</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm mt-4">
+                                <div class="space-y-2">
+                                    <p class="text-gray-300 font-bold border-l-2 border-red-500 pl-2">Camera & Setting</p>
+                                    <p class="text-gray-500 leading-relaxed">익스피리언스 센터 내부. 밝고 활기찬 분위기. 부감 샷(High Angle)으로 촬영.</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-gray-300 font-bold border-l-2 border-red-500 pl-2">Acting Directions</p>
+                                    <p class="text-gray-500 leading-relaxed">기대에 찬 눈빛. 서로 협력하는 모습. 자연스러운 대화.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6 bg-white/5 rounded-2xl border border-white/10">
+                            <h4 class="font-bold text-red-400 mb-1">SCENE 2: 갈등과 해결</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm mt-4">
+                                <div class="space-y-2">
+                                    <p class="text-gray-300 font-bold border-l-2 border-red-500 pl-2">Camera & Setting</p>
+                                    <p class="text-gray-500 leading-relaxed">클로즈업 샷을 활용하여 감정 전달. 조명은 대비가 강하게 설정.</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-gray-300 font-bold border-l-2 border-red-500 pl-2">Acting Directions</p>
+                                    <p class="text-gray-500 leading-relaxed">진지한 토론. 해결책을 찾았을 때의 안도감.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            edit: `
+                <div class="space-y-8">
+                    <div class="flex items-center gap-4 border-b border-white/10 pb-4">
+                        <i data-lucide="monitor-play" class="w-10 h-10 text-green-400"></i>
+                        <h2 class="text-2xl md:text-3xl font-bold cinematic-font">AI Tool Editing Schedule</h2>
+                    </div>
+                    <div class="overflow-hidden rounded-2xl border border-white/10">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-white/10 uppercase tracking-widest font-bold text-gray-400 text-xs">
+                                <tr>
+                                    <th class="p-4">Workflow</th>
+                                    <th class="p-4">AI Tools & Tasks</th>
+                                    <th class="p-4">Target</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5 bg-white/5 text-xs md:text-sm">
+                                <tr>
+                                    <td class="p-4 text-green-400 font-bold">Smart Cutting</td>
+                                    <td class="p-4 text-gray-300">AI를 활용한 최적의 컷 자동 추천 및 오디오 기반 자막 생성.</td>
+                                    <td class="p-4 text-gray-500">Day 1</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 text-green-400 font-bold">Generative Sound</td>
+                                    <td class="p-4 text-gray-300">작품 분위기에 최적화된 배경음악 생성 및 노이즈 제거.</td>
+                                    <td class="p-4 text-gray-500">Day 2</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 text-green-400 font-bold">Visual Enhance</td>
+                                    <td class="p-4 text-gray-300">업스케일링 및 AI 색보정(Color Grading)을 통한 시네마틱 룩 완성.</td>
+                                    <td class="p-4 text-gray-500">Day 3</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-6 bg-green-500/10 rounded-2xl border border-green-500/20">
+                        <p class="text-sm italic text-green-200">"AI 기술은 창작자의 상상력을 현실로 만드는 가장 강력한 도구입니다."</p>
+                    </div>
+                </div>
+            `
+        };
+
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalContent = document.getElementById('modal-content');
+        const closeModal = document.getElementById('close-modal');
+
+        function openLabModal(type) {
+            modalContent.innerHTML = labTemplates[type];
+            modalOverlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            lucide.createIcons();
+            gsap.from("#modal-overlay > div", { scale: 0.95, opacity: 0, duration: 0.3 });
+        }
+
+        closeModal.onclick = () => {
+            gsap.to("#modal-overlay > div", { scale: 0.95, opacity: 0, duration: 0.2, onComplete: () => {
+                modalOverlay.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }});
+        };
+
+        modalOverlay.onclick = (e) => { if (e.target === modalOverlay) closeModal.click(); };
+
+        const fsButton = document.getElementById('fullscreen-toggle');
+        fsButton.onclick = () => {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
+        };
+
+        document.addEventListener('fullscreenchange', () => {
+            fsButton.innerHTML = document.fullscreenElement ? '<i data-lucide="minimize" class="w-5 h-5"></i>' : '<i data-lucide="maximize" class="w-5 h-5"></i>';
+            lucide.createIcons();
+        });
+
+        const tl = gsap.timeline();
+        tl.to("#hero-sub", { opacity: 1, y: 0, duration: 1, delay: 0.5 })
+          .to("#hero-title", { scale: 1.02, duration: 1.5 }, "-=0.5")
+          .to("#hero-desc", { opacity: 1, duration: 1 }, "-=1")
+          .to("#hero-btn", { opacity: 1, y: 0, duration: 1 }, "-=0.5");
+
+        document.querySelectorAll('.reveal-section').forEach(section => {
+            ScrollTrigger.create({
+                trigger: section,
+                start: "top 85%",
+                onEnter: () => section.classList.add('active')
+            });
+        });
+    </script>
+</body>
+</html>
